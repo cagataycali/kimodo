@@ -16,9 +16,9 @@ class LLM2VecEncoder:
     def __init__(
         self,
         base_model_name_or_path: str,
-        peft_model_name_or_path: str,
-        dtype: str,
-        llm_dim: int,
+        peft_model_name_or_path: str = None,
+        dtype: str = "bfloat16",
+        llm_dim: int = 4096,
     ) -> None:
         torch_dtype = getattr(torch, dtype)
         self.llm_dim = llm_dim
@@ -27,7 +27,8 @@ class LLM2VecEncoder:
 
         if "TEXT_ENCODERS_DIR" in os.environ:
             base_model_name_or_path = os.path.join(os.environ["TEXT_ENCODERS_DIR"], base_model_name_or_path)
-            peft_model_name_or_path = os.path.join(os.environ["TEXT_ENCODERS_DIR"], peft_model_name_or_path)
+            if peft_model_name_or_path is not None:
+                peft_model_name_or_path = os.path.join(os.environ["TEXT_ENCODERS_DIR"], peft_model_name_or_path)
 
         self.model = LLM2Vec.from_pretrained(
             base_model_name_or_path=base_model_name_or_path,

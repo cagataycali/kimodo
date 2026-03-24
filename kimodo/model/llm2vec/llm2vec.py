@@ -58,6 +58,12 @@ from transformers import (
     Qwen2Config,
 )
 
+# Qwen3Config may not exist in older transformers versions
+try:
+    from transformers import Qwen3Config
+except ImportError:
+    Qwen3Config = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -108,6 +114,10 @@ class LLM2Vec(nn.Module):
             from .models.bidirectional_qwen2 import Qwen2BiModel
 
             return Qwen2BiModel
+        elif config_class_name == "Qwen3Config":
+            from .models.bidirectional_qwen3 import Qwen3BiModel
+
+            return Qwen3BiModel
         else:
             raise ValueError(f"{config_class_name} is not supported yet with bidirectional models.")
 
@@ -187,6 +197,15 @@ class LLM2Vec(nn.Module):
             "Qwen/Qwen2-7B-Instruct",
         ]:
             text = "<|im_start|>user\n" + text.strip() + "<|im_end|>"
+        if isinstance(self.model.config, Qwen2Config) and self.model.config._name_or_path not in [
+            "Qwen/Qwen2-1.5B-Instruct",
+            "Qwen/Qwen2-7B-Instruct",
+        ]:
+            # Qwen3 and other Qwen2-config models (Qwen3 uses Qwen2Config)
+            text = "<|im_start|>user\n" + text.strip() + "<|im_end|>"
+        if Qwen3Config is not None and isinstance(self.model.config, Qwen3Config):
+            # Qwen3 native config — same chat template
+            text = "<|im_start|>user\n" + text.strip() + "<|im_end|>"
         if self.pooling_mode == "eos_token":
             if self.model.config._name_or_path == "meta-llama/Meta-Llama-3-8B":
                 text = text.strip() + "<|end_of_text|>"
@@ -195,6 +214,8 @@ class LLM2Vec(nn.Module):
             elif isinstance(self.model.config, GemmaConfig):
                 text = text.strip() + "<eos>"
             elif isinstance(self.model.config, Qwen2Config):
+                text = text.strip() + "<|endoftext|>"
+            elif Qwen3Config is not None and isinstance(self.model.config, Qwen3Config):
                 text = text.strip() + "<|endoftext|>"
         return text
 

@@ -29,7 +29,16 @@ TEXT_ENCODER_PRESETS = {
             "dtype": "bfloat16",
             "llm_dim": 4096,
         },
-    }
+    },
+    "qwen3": {
+        "target": "kimodo.model.LLM2VecEncoder",
+        "kwargs": {
+            "base_model_name_or_path": "Qwen/Qwen3-8B",
+            "peft_model_name_or_path": None,
+            "dtype": "bfloat16",
+            "llm_dim": 4096,
+        },
+    },
 }
 
 
