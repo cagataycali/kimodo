@@ -12,8 +12,8 @@ Kimodo is a **ki**nematic **mo**tion **d**iffusi**o**n model trained on a large-
 This repository provides:
 - **Inference**: code and CLI to generate motions on both human and robot skeletons
 - **Interactive Demo**: easily author motions with a timeline interface of text prompts and kinematic controls
-- **Annotations**: [additional text descriptions](https://huggingface.co/datasets/nvidia/SEED-Timeline-Annotations) for the [BONES-SEED](https://huggingface.co/datasets/bones-studio/seed) dataset, including fine-grained temporal descriptions
 - **Benchmark**: [test cases](https://huggingface.co/datasets/nvidia/Kimodo-Motion-Gen-Benchmark) and evaluation code built on the [BONES-SEED](https://huggingface.co/datasets/bones-studio/seed) dataset to evaluate motion generation models based on text and constraint-following abilities
+- **Annotations**: fine-grained temporal text descriptions created for the Kimodo project are included in the [BONES-SEED](https://huggingface.co/datasets/bones-studio/seed) dataset. For more information on these labels, see our separate [Hugging Face repo](https://huggingface.co/datasets/nvidia/SEED-Timeline-Annotations).
 
 <div align="center">
   <img src="assets/teaser.gif" width="1280">
@@ -23,6 +23,7 @@ This repository provides:
 
 See the [full changelog](CHANGELOG.md) for a detailed list of all changes.
 
+- **[2026-05-03]** _FIX_: fixed a bug causing incorrect calculation of averaged metrics for constraint test cases in the benchmark
 - **[2026-04-24]** _NEW_: improved multi-prompt generation and better support for small VRAM GPUs via `TEXT_ENCODER_DEVICE=cpu` env var
 - **[2026-04-10]** Released the [Kimodo Motion Generation Benchmark](#kimodo-motion-generation-benchmark) alongside new v1.1 Kimodo-SOMA models
 - **[2026-03-19]** **Breaking:** Model inputs/outputs now use the SOMA 77-joint skeleton (`somaskel77`).

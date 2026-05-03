@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-05-03]
+
+### Fixed
+- `benchmark/parse_folder.py` now averages each metric only over the testcases that actually report it. Previously, sparse constraint metrics (`constraint_root2d_acc`, `constraint_root2d_err`, `constraint_root2d_err_p95`, `constraint_fullbody_keyframe`, `constraint_end_effector`) were divided by the total motion count of the (split, category), including testcases of other constraint kinds that did not report the metric. This silently scaled values by `motions_with_metric / total_motions` (e.g. `constraint_root2d_acc` displayed as ~0.57 when the true value was ~0.93). Both the printed table and `summary_rows.json` are affected, including the combined constraints row that merges `constraints_withtext` and `constraints_notext`. Text-following metrics, foot-skate/contact metrics, and TMR metrics are unchanged.
+- Updated Kimodo benchmark results in the documentation with this fix applied.
+
 ## [2026-04-24]
 
 ### Added

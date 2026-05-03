@@ -74,16 +74,26 @@ def _parse_testcase_key(root: Path, testcase_dir: Path) -> tuple[str, str]:
     return split, category
 
 
-def _accumulate_weighted(acc: dict[str, float], metric_dict: dict[str, Any], weight: float) -> None:
+def _accumulate_weighted(
+    sum_acc: dict[str, float],
+    weight_acc: dict[str, float],
+    metric_dict: dict[str, Any],
+    weight: float,
+) -> None:
     for metric_name, value in metric_dict.items():
         if isinstance(value, (int, float)):
-            acc[metric_name] = acc.get(metric_name, 0.0) + float(value) * weight
+            sum_acc[metric_name] = sum_acc.get(metric_name, 0.0) + float(value) * weight
+            weight_acc[metric_name] = weight_acc.get(metric_name, 0.0) + weight
 
 
-def _to_averages(weighted_sum: dict[str, float], total_weight: float) -> dict[str, float]:
-    if total_weight <= 0:
-        return {}
-    return {k: v / total_weight for k, v in sorted(weighted_sum.items())}
+def _to_averages(
+    weighted_sum: dict[str, float], weight: dict[str, float]
+) -> dict[str, float]:
+    return {
+        k: v / weight[k]
+        for k, v in sorted(weighted_sum.items())
+        if weight.get(k, 0.0) > 0
+    }
 
 
 def _load_result_row(
@@ -138,9 +148,9 @@ def _build_tables(
         # Text-following table: Overview, Timeline single, Timeline multi.
         for category in TEXT_FOLLOWING_CATEGORIES:
             acc = row_acc[(split, category)]
-            per_motion_gen = _to_averages(acc["per_motion_mean_weighted_sum"], acc["num_motions"])
-            per_motion_gt = _to_averages(acc["per_motion_mean_gt_weighted_sum"], acc["num_motions"])
-            tmr_avg = _to_averages(acc["tmr_weighted_sum"], acc["tmr_weight"]) if acc["tmr_weight"] > 0 else {}
+            per_motion_gen = _to_averages(acc["per_motion_mean_weighted_sum"], acc["per_motion_mean_weight"])
+            per_motion_gt = _to_averages(acc["per_motion_mean_gt_weighted_sum"], acc["per_motion_mean_gt_weight"])
+            tmr_avg = _to_averages(acc["tmr_weighted_sum"], acc["tmr_weight"]) if acc["tmr_weight"] else {}
             r03_gen = tmr_avg.get("TMR/t2m_R/R03")
             r03_gt = tmr_avg.get("TMR/t2m_gt_R/R03")
             fid_gen_text = tmr_avg.get("TMR/FID/gen_text")
@@ -170,8 +180,8 @@ def _build_tables(
         # Constraints table: Constraints with text, Constraints without text.
         for category in CONSTRAINTS_CATEGORIES:
             acc = row_acc[(split, category)]
-            per_motion_gen = _to_averages(acc["per_motion_mean_weighted_sum"], acc["num_motions"])
-            per_motion_gt = _to_averages(acc["per_motion_mean_gt_weighted_sum"], acc["num_motions"])
+            per_motion_gen = _to_averages(acc["per_motion_mean_weighted_sum"], acc["per_motion_mean_weight"])
+            per_motion_gt = _to_averages(acc["per_motion_mean_gt_weighted_sum"], acc["per_motion_mean_gt_weight"])
             row_label = CONSTRAINTS_ROW_LABELS[category]
             row_dict: dict[str, Any] = {
                 "row": row_label,
@@ -556,9 +566,11 @@ def _build_summary(root: Path) -> dict[str, Any]:
                 "num_testcases": 0,
                 "num_motions": 0.0,
                 "per_motion_mean_weighted_sum": {},
+                "per_motion_mean_weight": {},
                 "per_motion_mean_gt_weighted_sum": {},
+                "per_motion_mean_gt_weight": {},
                 "tmr_weighted_sum": {},
-                "tmr_weight": 0.0,
+                "tmr_weight": {},
             }
 
     for testcase_dir in testcase_dirs:
@@ -569,25 +581,39 @@ def _build_summary(root: Path) -> dict[str, Any]:
         acc = row_acc[(split, category)]
         acc["num_testcases"] += 1
         acc["num_motions"] += num_motions
-        _accumulate_weighted(acc["per_motion_mean_weighted_sum"], per_motion_mean_gen, num_motions)
+        _accumulate_weighted(
+            acc["per_motion_mean_weighted_sum"],
+            acc["per_motion_mean_weight"],
+            per_motion_mean_gen,
+            num_motions,
+        )
         if per_motion_mean_gt:
-            _accumulate_weighted(acc["per_motion_mean_gt_weighted_sum"], per_motion_mean_gt, num_motions)
+            _accumulate_weighted(
+                acc["per_motion_mean_gt_weighted_sum"],
+                acc["per_motion_mean_gt_weight"],
+                per_motion_mean_gt,
+                num_motions,
+            )
         if tmr:
-            _accumulate_weighted(acc["tmr_weighted_sum"], tmr, num_motions)
-            acc["tmr_weight"] += num_motions
+            _accumulate_weighted(
+                acc["tmr_weighted_sum"],
+                acc["tmr_weight"],
+                tmr,
+                num_motions,
+            )
 
     rows: list[dict[str, Any]] = []
     for split in SPLITS:
         for category in ROW_CATEGORIES:
             acc = row_acc[(split, category)]
-            tmr_avg = _to_averages(acc["tmr_weighted_sum"], acc["tmr_weight"]) if acc["tmr_weight"] > 0 else {}
-            per_motion_gt_avg = _to_averages(acc["per_motion_mean_gt_weighted_sum"], acc["num_motions"])
+            tmr_avg = _to_averages(acc["tmr_weighted_sum"], acc["tmr_weight"]) if acc["tmr_weight"] else {}
+            per_motion_gt_avg = _to_averages(acc["per_motion_mean_gt_weighted_sum"], acc["per_motion_mean_gt_weight"])
             row_dict: dict[str, Any] = {
                 "split": split,
                 "category": category,
                 "num_testcases": acc["num_testcases"],
                 "num_motions": int(acc["num_motions"]),
-                "per_motion_mean": _to_averages(acc["per_motion_mean_weighted_sum"], acc["num_motions"]),
+                "per_motion_mean": _to_averages(acc["per_motion_mean_weighted_sum"], acc["per_motion_mean_weight"]),
                 "tmr": tmr_avg,
             }
             if per_motion_gt_avg:
@@ -597,36 +623,32 @@ def _build_summary(root: Path) -> dict[str, Any]:
         # Combined constraints row for this split.
         withtext = row_acc[(split, "constraints_withtext")]
         notext = row_acc[(split, "constraints_notext")]
-        combined_weight = withtext["num_motions"] + notext["num_motions"]
 
         combined_per_motion = defaultdict(float)
+        combined_per_motion_weight = defaultdict(float)
         combined_per_motion_gt = defaultdict(float)
+        combined_per_motion_gt_weight = defaultdict(float)
         combined_tmr = defaultdict(float)
-        combined_tmr_weight = withtext["tmr_weight"] + notext["tmr_weight"]
-        for source in (
-            withtext["per_motion_mean_weighted_sum"],
-            notext["per_motion_mean_weighted_sum"],
+        combined_tmr_weight = defaultdict(float)
+        for sum_key, weight_key, sum_acc, weight_acc in (
+            ("per_motion_mean_weighted_sum", "per_motion_mean_weight", combined_per_motion, combined_per_motion_weight),
+            ("per_motion_mean_gt_weighted_sum", "per_motion_mean_gt_weight", combined_per_motion_gt, combined_per_motion_gt_weight),
+            ("tmr_weighted_sum", "tmr_weight", combined_tmr, combined_tmr_weight),
         ):
-            for k, v in source.items():
-                combined_per_motion[k] += v
-        for source in (
-            withtext["per_motion_mean_gt_weighted_sum"],
-            notext["per_motion_mean_gt_weighted_sum"],
-        ):
-            for k, v in source.items():
-                combined_per_motion_gt[k] += v
-        for source in (withtext["tmr_weighted_sum"], notext["tmr_weighted_sum"]):
-            for k, v in source.items():
-                combined_tmr[k] += v
+            for src in (withtext, notext):
+                for k, v in src[sum_key].items():
+                    sum_acc[k] += v
+                for k, w in src[weight_key].items():
+                    weight_acc[k] += w
 
-        combined_tmr_avg = _to_averages(dict(combined_tmr), combined_tmr_weight) if combined_tmr_weight > 0 else {}
-        combined_gt_avg = _to_averages(dict(combined_per_motion_gt), combined_weight)
+        combined_tmr_avg = _to_averages(dict(combined_tmr), dict(combined_tmr_weight)) if combined_tmr_weight else {}
+        combined_gt_avg = _to_averages(dict(combined_per_motion_gt), dict(combined_per_motion_gt_weight))
         combined_row: dict[str, Any] = {
             "split": split,
             "category": "constraints",
             "num_testcases": withtext["num_testcases"] + notext["num_testcases"],
-            "num_motions": int(combined_weight),
-            "per_motion_mean": _to_averages(dict(combined_per_motion), combined_weight),
+            "num_motions": int(withtext["num_motions"] + notext["num_motions"]),
+            "per_motion_mean": _to_averages(dict(combined_per_motion), dict(combined_per_motion_weight)),
             "tmr": combined_tmr_avg,
         }
         if combined_gt_avg:

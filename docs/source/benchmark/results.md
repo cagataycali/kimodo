@@ -36,10 +36,11 @@ These results are for the Kimodo model trained on the public [BONES-SEED](https:
 
 |  | With text FB Pos↓ | With text EE Pos↓ | With text EE Rot↓ | With text 2D Root↓ | With text Pelvis@95% | Without text FB Pos↓ | Without text EE Pos↓ | Without text EE Rot↓ | Without text 2D Root↓ | Without text Pelvis@95% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Content** Ground Truth | 0.000 | 0.000 | - | 2.362 | 3.30 | 0.000 | 0.000 | - | 2.408 | 3.33 |
-| **Content** Kimodo | 1.316 | 1.762 | - | 3.064 | 5.62 | 1.277 | 1.691 | - | 2.952 | 5.56 |
-| **Repetition** Ground Truth | 0.000 | 0.000 | - | 2.220 | 3.35 | 0.000 | 0.000 | - | 2.195 | 3.34 |
-| **Repetition** Kimodo | 1.226 | 1.778 | - | 2.913 | 5.65 | 1.200 | 1.620 | - | 2.624 | 4.85 |
+| **Content** Ground Truth | 0.000 | 0.000 | - | 3.837 | 5.36 | 0.000 | 0.000 | - | 3.913 | 5.41 |
+| **Content** Kimodo | 3.421 | 3.817 | - | 4.979 | 9.14 | 3.320 | 3.664 | - | 4.797 | 9.03 |
+| **Repetition** Ground Truth | 0.000 | 0.000 | - | 3.607 | 5.44 | 0.000 | 0.000 | - | 3.567 | 5.42 |
+| **Repetition** Kimodo | 3.187 | 3.852 | - | 4.734 | 9.19 | 3.120 | 3.510 | - | 4.264 | 7.89 |
+
 
 
 ## Kimodo-SOMA-RP-v1.1
@@ -59,10 +60,10 @@ These results are for the Kimodo model trained on the full (proprietary) Bones R
 
 |  | With text FB Pos↓ | With text EE Pos↓ | With text EE Rot↓ | With text 2D Root↓ | With text Pelvis@95% | Without text FB Pos↓ | Without text EE Pos↓ | Without text EE Rot↓ | Without text 2D Root↓ | Without text Pelvis@95% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Content** Ground Truth | 0.000 | 0.000 | - | 2.362 | 3.30 | 0.000 | 0.000 | - | 2.408 | 3.33 |
-| **Content** Kimodo | 1.126 | 1.398 | - | 2.819 | 4.78 | 1.129 | 1.382 | - | 2.714 | 4.54 |
-| **Repetition** Ground Truth | 0.000 | 0.000 | - | 2.220 | 3.35 | 0.000 | 0.000 | - | 2.195 | 3.34 |
-| **Repetition** Kimodo | 1.078 | 1.377 | - | 2.621 | 4.69 | 1.088 | 1.370 | - | 2.478 | 4.44 | 
+| **Content** Ground Truth | 0.000 | 0.000 | - | 3.837 | 5.36 | 0.000 | 0.000 | - | 3.913 | 5.41 |
+| **Content** Kimodo | 2.929 | 3.029 | - | 4.581 | 7.77 | 2.935 | 2.994 | - | 4.411 | 7.37 |
+| **Repetition** Ground Truth | 0.000 | 0.000 | - | 3.607 | 5.44 | 0.000 | 0.000 | - | 3.567 | 5.42 |
+| **Repetition** Kimodo | 2.804 | 2.983 | - | 4.260 | 7.63 | 2.829 | 2.969 | - | 4.027 | 7.21 |
 -->
 
 
@@ -88,9 +89,9 @@ Results are reported for two models:
 
 |  | With text FB Pos↓ | With text EE Pos↓ | With text EE Rot↓ | With text 2D Root↓ | With text Pelvis@95% | Without text FB Pos↓ | Without text EE Pos↓ | Without text EE Rot↓ | Without text 2D Root↓ | Without text Pelvis@95% |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Content** Ground Truth | 0.000 | 0.000 | - | 2.362 | 3.30 | 0.000 | 0.000 | - | 2.408 | 3.33 |
-| **Content** Kimodo-SOMA-SEED-v1.1 | 1.316 | 1.762 | - | 3.064 | 5.62 | 1.277 | 1.691 | - | 2.952 | 5.56 |
-| **Content** Kimodo-SOMA-RP-v1.1 | 1.126 | 1.398 | - | 2.819 | 4.78 | 1.129 | 1.382 | - | 2.714 | 4.54 |
-| **Repetition** Ground Truth | 0.000 | 0.000 | - | 2.220 | 3.35 | 0.000 | 0.000 | - | 2.195 | 3.34 |
-| **Repetition** Kimodo-SOMA-SEED-v1.1 | 1.226 | 1.778 | - | 2.913 | 5.65 | 1.200 | 1.620 | - | 2.624 | 4.85 |
-| **Repetition** Kimodo-SOMA-RP-v1.1 | 1.078 | 1.377 | - | 2.621 | 4.69 | 1.088 | 1.370 | - | 2.478 | 4.44 |
+| **Content** Ground Truth | 0.000 | 0.000 | - | 3.837 | 5.36 | 0.000 | 0.000 | - | 3.913 | 5.41 |
+| **Content** Kimodo-SOMA-SEED-v1.1 | 3.421 | 3.817 | - | 4.979 | 9.14 | 3.320 | 3.664 | - | 4.797 | 9.03 |
+| **Content** Kimodo-SOMA-RP-v1.1 | 2.929 | 3.029 | - | 4.581 | 7.77 | 2.935 | 2.994 | - | 4.411 | 7.37 |
+| **Repetition** Ground Truth | 0.000 | 0.000 | - | 3.607 | 5.44 | 0.000 | 0.000 | - | 3.567 | 5.42 |
+| **Repetition** Kimodo-SOMA-SEED-v1.1 | 3.187 | 3.852 | - | 4.734 | 9.19 | 3.120 | 3.510 | - | 4.264 | 7.89 |
+| **Repetition** Kimodo-SOMA-RP-v1.1 | 2.804 | 2.983 | - | 4.260 | 7.63 | 2.829 | 2.969 | - | 4.027 | 7.21 |
